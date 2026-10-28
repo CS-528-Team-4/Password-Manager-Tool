@@ -58,15 +58,36 @@ export async function readVault() {
     tx.oncomplete = () => database.close();
   });
 }
-export async function writeVault(record) {
+// Read and compare within the same read/write transaction to avoid stale-tab overwrites.
+export async function writeVault(record, expected) {
   const database = await db();
   return new Promise((resolve, reject) => {
     const tx = database.transaction('vault', 'readwrite');
-    tx.objectStore('vault').put(record, 'main');
+    const store = tx.objectStore('vault');
+    let conflict = false;
+    const request = store.get('main');
+    request.onsuccess = () => {
+      if (JSON.stringify(request.result) !== JSON.stringify(expected)) {
+        conflict = true;
+        tx.abort();
+        return;
+      }
+      store.put(record, 'main');
+    };
     tx.oncomplete = () => {
       database.close();
       resolve();
     };
-    tx.onerror = () => reject(tx.error);
+    tx.onabort = () => {
+      database.close();
+      reject(
+        Error(
+          conflict
+            ? 'Vault changed in another tab. Reload and unlock before saving.'
+            : 'Vault save failed.',
+        ),
+      );
+    };
+    tx.onerror = () => {};
   });
 }

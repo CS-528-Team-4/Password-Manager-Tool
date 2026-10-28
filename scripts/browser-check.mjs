@@ -1,9 +1,12 @@
-import { mkdir } from 'node:fs/promises';
+﻿import { mkdir } from 'node:fs/promises';
 import { chromium } from '@playwright/test';
 import assert from 'node:assert/strict';
 await mkdir('tmp', { recursive: true });
 const browser = await chromium.launch({ channel: 'chrome', headless: true });
-const page = await browser.newPage({ viewport: { width: 1600, height: 1000 } });
+const context = await browser.newContext({
+  viewport: { width: 1600, height: 1000 },
+});
+const page = await context.newPage();
 const errors = [];
 page.on('pageerror', (e) => errors.push(e.message));
 try {
@@ -156,6 +159,78 @@ try {
     '4111111111111111',
   );
   await page.getByRole('button', { name: 'Cancel', exact: true }).click();
+  await page.getByRole('button', { name: 'Settings', exact: true }).click();
+  await page.getByLabel('Automatic lock duration').selectOption('1');
+  await page.getByText('Automatic lock updated', { exact: true }).waitFor();
+  await page
+    .getByRole('button', { name: 'Password Generator', exact: true })
+    .click();
+  const generated = await page.locator('.password').innerText();
+  await page
+    .getByRole('button', { name: 'Save as a login', exact: true })
+    .click();
+  assert.equal(
+    await page.getByLabel('Password', { exact: true }).inputValue(),
+    generated,
+  );
+  await page.getByLabel('Title', { exact: true }).fill('Generated login');
+  await page.getByLabel('Website', { exact: true }).fill('generated.example');
+  await page.getByLabel('Tags', { exact: true }).fill('School, Security');
+  await page.getByRole('button', { name: 'Save', exact: true }).click();
+  await page
+    .getByRole('button', { name: 'generated.example', exact: true })
+    .waitFor();
+  await page.getByLabel('Search your vault').fill('School');
+  await page
+    .getByRole('button', { name: 'generated.example', exact: true })
+    .waitFor();
+  await page.getByLabel('Search your vault').fill('no-such-item');
+  await page
+    .getByRole('heading', { name: 'No matching items', exact: true })
+    .waitFor();
+  await page.getByLabel('Search your vault').fill('');
+  await page.getByRole('button', { name: 'Website ↑', exact: true }).click();
+  assert.equal(
+    await page.locator('th[aria-sort]').getAttribute('aria-sort'),
+    'descending',
+  );
+  const other = await page.context().newPage();
+  await other.goto('http://127.0.0.1:5173');
+  await other
+    .getByLabel('Master password', { exact: true })
+    .fill('Team4-test-password!');
+  await other
+    .getByRole('button', { name: 'Unlock vault', exact: true })
+    .click();
+  await other.getByRole('dialog').waitFor({ state: 'hidden' });
+  await other.getByRole('button', { name: 'Settings', exact: true }).click();
+  assert.equal(
+    await other.getByLabel('Automatic lock duration').inputValue(),
+    '1',
+  );
+  await other.getByRole('button', { name: 'Logins 1', exact: true }).click();
+  await other
+    .getByRole('button', { name: 'generated.example', exact: true })
+    .click();
+  await page
+    .getByRole('button', { name: 'generated.example', exact: true })
+    .click();
+  await page.getByLabel('Tags', { exact: true }).fill('School, Updated');
+  await page.getByRole('button', { name: 'Save', exact: true }).click();
+  await page
+    .getByRole('button', { name: 'generated.example', exact: true })
+    .waitFor();
+  await other
+    .getByLabel('Title', { exact: true })
+    .fill('Stale overwrite attempt');
+  await other.getByRole('button', { name: 'Save', exact: true }).click();
+  await other
+    .getByText(
+      'Vault changed in another tab. Reload and unlock before saving.',
+      { exact: true },
+    )
+    .waitFor();
+  await other.close();
   await page.setViewportSize({ width: 390, height: 844 });
   await page
     .getByRole('button', { name: 'Password Generator', exact: true })

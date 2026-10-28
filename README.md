@@ -13,9 +13,9 @@ Open the localhost URL printed by Vite. Production: `npm run build`. Security te
 
 ## Features
 
-Configurable length (4�128), independent lowercase/uppercase/digit/punctuation controls, ambiguous-character exclusion, regeneration, clipboard copying, and entropy visualization. The screenshot labels Letters/Mixed case are split into independent case controls to meet the assignment requirements.
+Configurable length (4-128), independent lowercase/uppercase/digit/punctuation controls, ambiguous-character exclusion, regeneration, clipboard copying, and entropy visualization. The screenshot labels Letters/Mixed case are split into independent case controls to meet the assignment requirements.
 
-Local vault setup and unlock, login/card/address/note creation and editing, deletion, favorites, search, alphabetical sorting, and five-minute inactivity lock. Reference screens are preserved in references/screenshots.
+Local vault setup and unlock, login/card/address/note creation and editing, deletion, favorites, search, ascending/descending alphabetical sorting, and configurable inactivity lock (1, 5, 15, or 30 minutes; default 5). Reference screens are preserved in references/screenshots.
 
 ## Security design
 
@@ -34,7 +34,7 @@ Implementation references:
 
 ## Remaining coursework
 
-The team must verify secure randomness, understand and explain the code, complete its 3�5 page report and presentation, and review the AI usage statement. Instructor approval for the Avast proposal was confirmed by the user on October 28, 2026.
+The team must verify secure randomness, understand and explain the code, complete its 3-5 page report and presentation, and review the AI usage statement. Instructor approval for the Avast proposal was confirmed by the user on October 28, 2026.
 
 ## Project layout and maintenance
 
@@ -49,3 +49,11 @@ Run `npm run format` to format source and documentation, or `npm run format:chec
 Build output (`dist/`), dependencies (`node_modules/`), test artifacts, environment files, and temporary files are excluded by `.gitignore`. These generated directories may be recreated by normal development commands.
 
 Vault setup includes uppercase, lowercase, and digit requirements, confirmation, and an acknowledgment that the password differs from other accounts. Wallet supports separate Cards and Accounts. The help drawer mirrors the reference accordion layout; its Import Now button explains that importing is unavailable.
+
+## Organization and save safeguards
+
+Add comma-separated tags in the item editor. Tags are encrypted with the item and included in search. Click the Website/Title table header to reverse sorting. The generator's Save as a login button opens a login draft containing the generated password; complete the title and save it to persist it.
+
+Automatic lock duration is configurable in Settings and encrypted with the vault. A transactional comparison rejects saves based on an outdated vault record, preventing an older tab from silently overwriting a newer save. Reload and unlock the stale tab to refresh before reapplying changes. Concurrent writes within one tab are rejected while a save is in progress.
+
+The browser check also covers tag search, empty-result recovery, generated-login saving, persisted lock preferences, and rejection of stale updates across two tabs.

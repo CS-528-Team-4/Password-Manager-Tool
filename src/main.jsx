@@ -92,10 +92,16 @@ function App() {
     [busy, setBusy] = useState(false),
     [error, setError] = useState('');
   const [walletMenu, setWalletMenu] = useState(false),
-    [visibleField, setVisibleField] = useState(null);
+    [visibleField, setVisibleField] = useState(null),
+    [sortAscending, setSortAscending] = useState(true);
   const timer = useRef(),
-    keyRef = useRef(null);
+    keyRef = useRef(null),
+    savingRef = useRef(false),
+    pendingGenerated = useRef(null);
   keyRef.current = key;
+  useEffect(() => {
+    if (!modal) pendingGenerated.current = null;
+  }, [modal]);
   useEffect(() => {
     if (!modal && !help) return;
     const previous = document.body.style.overflow;
@@ -154,6 +160,8 @@ function App() {
     setModal(null);
     setWalletMenu(false);
     setVisibleField(null);
+    setHelp(null);
+    pendingGenerated.current = null;
     setPassword(generatePassword(defaults));
     notify('Vault locked');
   };
@@ -162,7 +170,7 @@ function App() {
     let timeout;
     const reset = () => {
       clearTimeout(timeout);
-      timeout = setTimeout(lock, 5 * 60 * 1000);
+      timeout = setTimeout(lock, (data.settings?.lockMinutes || 5) * 60 * 1000);
     };
     reset();
     window.addEventListener('pointerdown', reset);
@@ -172,7 +180,7 @@ function App() {
       window.removeEventListener('pointerdown', reset);
       window.removeEventListener('keydown', reset);
     };
-  }, [key]);
+  }, [key, data.settings?.lockMinutes]);
   useEffect(() => {
     const close = (e) => {
       if (e.key === 'Escape') {
@@ -236,6 +244,16 @@ function App() {
       setKey(k);
       setData(content);
       setModal(record ? null : 'setup-complete');
+      if (pendingGenerated.current) {
+        setPage('Logins');
+        setDraft({
+          type: 'Logins',
+          values: { Password: pendingGenerated.current },
+          favorite: false,
+          tags: [],
+        });
+        pendingGenerated.current = null;
+      }
     } catch (e) {
       setError(
         record
@@ -247,12 +265,43 @@ function App() {
     }
   }
   async function persist(next) {
-    const saved = { version: 1, salt: record.salt, ...(await seal(key, next)) };
-    await writeVault(saved);
-    if (keyRef.current === key) {
-      setRecord(saved);
-      setData(next);
+    if (!key || keyRef.current !== key)
+      throw Error('Unlock the vault before saving.');
+    if (savingRef.current)
+      throw Error('Another save is in progress. Please try again.');
+    savingRef.current = true;
+    try {
+      const saved = {
+        version: 1,
+        salt: record.salt,
+        ...(await seal(key, next)),
+      };
+      if (keyRef.current !== key) throw Error('Vault locked before saving.');
+      await writeVault(saved, record);
+      if (keyRef.current === key) {
+        setRecord(saved);
+        setData(next);
+      }
+    } finally {
+      savingRef.current = false;
     }
+  }
+  function saveGenerated() {
+    if (!password) return;
+    if (!key) {
+      pendingGenerated.current = password;
+      setError('');
+      setModal('unlock');
+      return;
+    }
+    setPage('Logins');
+    setDraft({
+      type: 'Logins',
+      values: { Password: password },
+      favorite: false,
+      tags: [],
+    });
+    setVisibleField(null);
   }
   async function saveItem(e) {
     e.preventDefault();
@@ -260,6 +309,9 @@ function App() {
     try {
       const item = {
         ...draft,
+        tags: [
+          ...new Set((draft.tags || []).map((t) => t.trim()).filter(Boolean)),
+        ],
         updated: new Date().toISOString(),
         id: draft.id || crypto.randomUUID(),
       };
@@ -269,8 +321,8 @@ function App() {
       });
       setDraft(null);
       notify('Item saved securely');
-    } catch {
-      notify('Save failed. Your changes have not been stored.');
+    } catch (e) {
+      notify(e.message || 'Save failed. Your changes have not been stored.');
     } finally {
       setBusy(false);
     }
@@ -296,11 +348,19 @@ function App() {
     .filter(
       (i) =>
         (page === 'Favorites' ? i.favorite : i.type === page) &&
-        Object.values(i.values).some((v) =>
+        [...Object.values(i.values), ...(i.tags || [])].some((v) =>
           String(v).toLowerCase().includes(query.toLowerCase()),
         ),
     )
-    .sort((a, b) => (a.values.Title || '').localeCompare(b.values.Title || ''));
+    .sort((a, b) => {
+      const field = page === 'Logins' ? 'Website' : 'Title';
+      return (
+        (sortAscending ? 1 : -1) *
+        (a.values[field] || a.values.Title || '').localeCompare(
+          b.values[field] || b.values.Title || '',
+        )
+      );
+    });
   const go = (p) => {
     setPage(p);
     setWalletMenu(false);
@@ -478,7 +538,9 @@ function App() {
                                 ...draft,
                                 values: {
                                   ...draft.values,
-                                  Password: generatePassword(options),
+                                  Password: generatePassword(
+                                    password ? options : defaults,
+                                  ),
                                 },
                               })
                             }
@@ -503,6 +565,30 @@ function App() {
                 />
                 Mark as favorite
               </label>
+              <div className="tag-editor">
+                <label>
+                  Tags
+                  <input
+                    aria-label="Tags"
+                    placeholder="Work, Personal, Banking"
+                    value={(draft.tags || []).join(',')}
+                    onChange={(e) =>
+                      setDraft({ ...draft, tags: e.target.value.split(',') })
+                    }
+                  />
+                </label>
+                <p className="fine">
+                  Separate tags with commas. Search by tag to find related
+                  items.
+                </p>
+                <div className="tag-list">
+                  {(draft.tags || [])
+                    .filter((t) => t.trim())
+                    .map((tag, i) => (
+                      <span key={i}>{tag.trim()}</span>
+                    ))}
+                </div>
+              </div>
               <LockKeyhole />
               <p>Your item is encrypted before it is saved on this device.</p>
               {draft.id && (
@@ -635,6 +721,13 @@ function App() {
             >
               Restore Default Settings
             </button>
+            <button
+              className="restore save-generated"
+              disabled={!password}
+              onClick={saveGenerated}
+            >
+              Save as a login
+            </button>
           </>
         ) : page === 'Settings' ? (
           <div className="settings">
@@ -655,11 +748,39 @@ function App() {
               <div>
                 <h2>Automatic lock</h2>
                 <p>
-                  Your vault locks after 5 minutes without keyboard or pointer
-                  activity.
+                  Your vault locks after {data.settings?.lockMinutes || 5}{' '}
+                  minutes without keyboard or pointer activity.
                 </p>
               </div>
-              <LockKeyhole />
+              <label className="lock-setting">
+                Lock after
+                <select
+                  aria-label="Automatic lock duration"
+                  disabled={!key || busy}
+                  value={data.settings?.lockMinutes || 5}
+                  onChange={async (e) => {
+                    const lockMinutes = Number(e.target.value);
+                    setBusy(true);
+                    try {
+                      await persist({
+                        ...data,
+                        settings: { ...data.settings, lockMinutes },
+                      });
+                      notify('Automatic lock updated');
+                    } catch (e) {
+                      notify(e.message);
+                    } finally {
+                      setBusy(false);
+                    }
+                  }}
+                >
+                  {[1, 5, 15, 30].map((n) => (
+                    <option key={n} value={n}>
+                      {n} minute{n === 1 ? '' : 's'}
+                    </option>
+                  ))}
+                </select>
+              </label>
             </section>
             <h3>BROWSER INTEGRATION</h3>
             {['Biometric unlock', 'Browser autofill', 'Notifications'].map(
@@ -689,7 +810,10 @@ function App() {
           </div>
         ) : (
           <>
-            {(page === 'Logins' || visible.length > 0) && (
+            {(page === 'Logins' ||
+              data.items.some((i) =>
+                page === 'Favorites' ? i.favorite : i.type === page,
+              )) && (
               <>
                 <div
                   className={
@@ -708,7 +832,17 @@ function App() {
                   <table>
                     <thead>
                       <tr>
-                        <th>{page === 'Logins' ? 'Website' : 'Title'} ↑</th>
+                        <th
+                          aria-sort={sortAscending ? 'ascending' : 'descending'}
+                        >
+                          <button
+                            className="sort-button"
+                            onClick={() => setSortAscending(!sortAscending)}
+                          >
+                            {page === 'Logins' ? 'Website' : 'Title'}{' '}
+                            {sortAscending ? '↑' : '↓'}
+                          </button>
+                        </th>
                         <th>{page === 'Logins' ? 'Username' : 'Type'}</th>
                         <th>Password</th>
                         <th>Last Modified</th>
@@ -739,6 +873,11 @@ function App() {
                             >
                               {item.values.Website || item.values.Title}
                             </button>
+                            <div className="tag-list">
+                              {(item.tags || []).map((tag, i) => (
+                                <span key={i}>{tag}</span>
+                              ))}
+                            </div>
                           </td>
                           <td>
                             {item.values.Username ||
@@ -773,7 +912,9 @@ function App() {
                                     ),
                                   });
                                 } catch {
-                                  notify('Unable to update favorite.');
+                                  notify(
+                                    'Unable to update favorite. Another tab may have changed the vault; reload and unlock to refresh.',
+                                  );
                                 }
                               }}
                             >
@@ -798,10 +939,15 @@ function App() {
                   (nav.find(([n]) => n === page) || [])[1] || Star,
                   {
                     size: 54,
-                    className: page === 'Logins' && key ? 'sr-only' : '',
+                    className:
+                      page === 'Logins' && key && !query ? 'sr-only' : '',
                   },
                 )}
-                <h2 className={page === 'Logins' && key ? 'sr-only' : ''}>
+                <h2
+                  className={
+                    page === 'Logins' && key && !query ? 'sr-only' : ''
+                  }
+                >
                   {!key
                     ? 'Your vault, secured'
                     : query
@@ -811,7 +957,9 @@ function App() {
                         : `Add Your ${page === 'Wallet' ? 'Cards and Accounts' : page}`}
                 </h2>
                 <p>
-                  {key && page === 'Logins' ? (
+                  {query ? (
+                    'Try another title, username, or tag.'
+                  ) : key && page === 'Logins' ? (
                     <>
                       Make your every day easier with Password Manager.
                       <br />

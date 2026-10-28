@@ -1783,3 +1783,67 @@ footer {
   border-radius: 40px;
   background: #0078ff;
 }
+.tag-editor {
+  margin: 30px 0;
+}
+.tag-editor label {
+  font-size: 15px;
+}
+.tag-editor input {
+  width: 100%;
+  margin-top: 8px;
+}
+.tag-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+}
+.tag-list:empty {
+  display: none;
+}
+.tag-list span {
+  background: #20495e;
+  border: 1px solid #3c667c;
+  border-radius: 12px;
+  padding: 3px 9px;
+  font-size: 12px;
+  color: #c7dfed;
+}
+.save-generated {
+  margin-left: 14px;
+  background: #0078ff;
+  border-color: #3998ff;
+}
+.lock-setting {
+  min-width: 140px;
+  margin: 0;
+}
+.lock-setting select {
+  background: #0c2e40;
+  color: #fff;
+  border: 1px solid #7599ad;
+  border-radius: 5px;
+  padding: 10px;
+}
+.sort-button {
+  border: 0;
+  border-radius: 0;
+  padding: 0;
+  font-weight: normal;
+  font-size: inherit;
+  color: inherit;
+}
+.settings select:focus-visible {
+  outline: 3px solid #72b6ff;
+  outline-offset: 3px;
+}
+@media (max-width: 700px) {
+  .save-generated {
+    margin-left: 0;
+    display: flex;
+  }
+  .tag-editor {
+    margin-top: 25px;
+  }
+}

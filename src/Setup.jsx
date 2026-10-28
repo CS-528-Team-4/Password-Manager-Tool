@@ -1,4 +1,4 @@
-﻿import React, { useState } from 'react';
+import React, { useState } from 'react';
 import { ArrowLeft, Check, Eye, EyeOff, X } from 'lucide-react';
 export function SetupForm({ onSubmit, busy, error }) {
   const [stage, setStage] = useState('profile'),

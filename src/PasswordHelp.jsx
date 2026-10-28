@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import { Info, Plus, Minus, X } from 'lucide-react';
 const titles = [
   'Save your passwords when prompted',
