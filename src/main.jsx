@@ -28,6 +28,7 @@ import { defaults, generatePassword, entropy } from './generator.js';
 import { deriveKey, seal, unseal, readVault, writeVault } from './vault.js';
 import './style.css';
 import Brand from './Brand.jsx';
+import AutofillDemo from './AutofillDemo.jsx';
 import PasswordHelp from './PasswordHelp.jsx';
 import { SetupForm, SetupComplete, UnlockForm } from './Setup.jsx';
 const nav = [
@@ -422,6 +423,13 @@ function App() {
           <SlidersHorizontal />
           Password Generator
         </button>
+        <button
+          className={'nav ' + (page === 'Autofill Demo' ? 'active' : '')}
+          onClick={() => go('Autofill Demo')}
+        >
+          <UserRound />
+          Autofill Demo
+        </button>
         <div className="sidebar-bottom">
           <ShieldCheck size={17} /> Team 4 · Educational project
         </div>
@@ -729,6 +737,20 @@ function App() {
               Save as a login
             </button>
           </>
+        ) : page === 'Autofill Demo' ? (
+          <AutofillDemo
+            key={key ? 'unlocked' : 'locked'}
+            unlocked={!!key}
+            items={data.items}
+            onUnlock={() => {
+              setError('');
+              setModal('unlock');
+            }}
+            onCreate={() => {
+              setPage('Logins');
+              setDraft({ type: 'Logins', values: {}, favorite: false });
+            }}
+          />
         ) : page === 'Settings' ? (
           <div className="settings">
             <h3>VAULT SECURITY</h3>

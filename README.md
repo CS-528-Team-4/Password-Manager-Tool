@@ -57,3 +57,7 @@ Add comma-separated tags in the item editor. Tags are encrypted with the item an
 Automatic lock duration is configurable in Settings and encrypted with the vault. A transactional comparison rejects saves based on an outdated vault record, preventing an older tab from silently overwriting a newer save. Reload and unlock the stale tab to refresh before reapplying changes. Concurrent writes within one tab are rejected while a save is in progress.
 
 The browser check also covers tag search, empty-result recovery, generated-login saving, persisted lock preferences, and rejection of stale updates across two tabs.
+
+## Autofill demo
+
+Open **Autofill Demo** in the sidebar. Unlock your vault and select a saved login with a username and password, then click **Autofill demo form**. The practice form is populated from the unlocked vault. Passwords are masked by default, Clear form removes the populated values, and locking the vault clears the demo. Sign in (demo) only shows a local confirmation: it performs no authentication and sends no credentials. This is an in-app demonstration, not browser-wide autofill.

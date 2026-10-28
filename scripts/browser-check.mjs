@@ -55,6 +55,57 @@ try {
   await page
     .getByRole('button', { name: 'example.com', exact: true })
     .waitFor();
+  await page
+    .getByRole('button', { name: 'Autofill Demo', exact: true })
+    .click();
+  await page
+    .getByLabel('Saved login')
+    .selectOption({ label: 'Example · example.com' });
+  await page
+    .getByRole('button', { name: 'Autofill demo form', exact: true })
+    .click();
+  assert.equal(await page.getByLabel('Demo username').inputValue(), 'student');
+  assert.equal(
+    await page.getByLabel('Demo password', { exact: true }).inputValue(),
+    'private-test-secret',
+  );
+  assert.equal(
+    await page
+      .getByLabel('Demo password', { exact: true })
+      .getAttribute('type'),
+    'password',
+  );
+  const demoRequests = [];
+  const watchRequest = (request) => demoRequests.push(request.url());
+  page.on('request', watchRequest);
+  await page
+    .getByRole('button', { name: 'Sign in (demo)', exact: true })
+    .click();
+  await page
+    .getByText(
+      'Demo complete. No account was authenticated and no credentials were sent.',
+      { exact: true },
+    )
+    .waitFor();
+  assert.deepEqual(demoRequests, []);
+  page.off('request', watchRequest);
+  await page.screenshot({ path: 'tmp/autofill-demo.png', fullPage: true });
+  await page.getByRole('button', { name: 'Clear form', exact: true }).click();
+  assert.equal(
+    await page.getByLabel('Demo password', { exact: true }).inputValue(),
+    '',
+  );
+  await page
+    .getByRole('button', { name: 'Autofill demo form', exact: true })
+    .click();
+  await page
+    .getByRole('button', { name: 'team4@example.com', exact: true })
+    .click();
+  assert.equal(await page.getByLabel('Demo username').inputValue(), '');
+  assert.equal(
+    await page.getByLabel('Demo password', { exact: true }).inputValue(),
+    '',
+  );
   await page.reload();
   await page.getByRole('dialog').waitFor();
   await page
