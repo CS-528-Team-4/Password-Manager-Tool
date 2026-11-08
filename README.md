@@ -38,11 +38,34 @@ The team must verify secure randomness, understand and explain the code, complet
 
 ## Project layout and maintenance
 
-- `src/`: React screens, styles, password generation, and encrypted vault storage.
-- `tests/security.test.js`: generator and encryption checks.
-- `scripts/browser-check.mjs`: Chrome checks for setup, vault actions, wallet cards/accounts, help accordions, and mobile layout.
-- `references/screenshots/`: original UI references. Assignment and proposal PDFs remain in the project root.
-- `AI_USAGE.md`: draft statement for team review.
+```text
+src/
+  main.jsx                       React bootstrap and stylesheet import
+  App.jsx                        Shared session state and application actions
+  components/
+    auth/                        Vault creation, unlock, and dialogs
+    demo/                        Local autofill demonstration
+    generator/                   Password generator screen
+    layout/                      Brand, header, and sidebar navigation
+    settings/                    Security and application settings
+    vault/                       Item editor, item list, and help drawer
+  config/
+    vaultConfig.js               Navigation entries and item field definitions
+  lib/
+    security/
+      generator.js               Secure password sampling and entropy
+      vaultCrypto.js             Key derivation and authenticated encryption
+    storage/
+      vaultStore.js              IndexedDB reads and transactional writes
+  styles/
+    app.css                      Shared theme, responsive layout, and interactions
+scripts/
+  browser-check.mjs              End-to-end Chrome checks
+tests/
+  security.test.js               Generator and encryption tests
+```
+
+Reference screenshots are in `references/screenshots/`. Assignment and proposal PDFs remain in the root. `AI_USAGE.md` is the draft statement for team review. See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for data flow and maintenance guidance.
 
 Run `npm run format` to format source and documentation, or `npm run format:check` to check formatting. Run `npm test` for security checks. With the dev server running at `http://127.0.0.1:5173`, run `npm run test:browser` for browser checks; this requires installed Google Chrome. The browser script creates an isolated test profile and saves review images under ignored `tmp/`.
 
@@ -60,4 +83,10 @@ The browser check also covers tag search, empty-result recovery, generated-login
 
 ## Autofill demo
 
-Open **Autofill Demo** in the sidebar. Unlock your vault and select a saved login with a username and password, then click **Autofill demo form**. The practice form is populated from the unlocked vault. Passwords are masked by default, Clear form removes the populated values, and locking the vault clears the demo. Sign in (demo) only shows a local confirmation: it performs no authentication and sends no credentials. This is an in-app demonstration, not browser-wide autofill.
+Open **Autofill Demo** in the sidebar and choose a platform card: Google, YouTube, Student Portal, Demo Shop, or a website from your saved logins. Each card opens a local practice login screen. These screens do not navigate to or authenticate with the real services.
+
+Save a login with its website, username, and password first. A single matching login fills automatically when you open its platform. If multiple accounts match, choose an account from the password-manager suggestions beside the username field. The key icon opens the suggestions again. Clear form resets the fields; locking clears populated credentials. A platform with no matching account offers Add a login with the website prefilled.
+
+Matching uses parsed hostnames rather than partial text. `www` is normalized, and Google explicitly accepts `accounts.google.com`. Different websites do not receive each other's saved logins. The sample sign-in shows a local welcome message and sends no credentials.
+
+Browser tests can target a production preview with `TEST_BASE_URL`. In PowerShell, start `npm run preview -- --port 4173` in one terminal, then run `$env:TEST_BASE_URL='http://127.0.0.1:4173'; npm run test:browser` in another. Tests run in an isolated Chrome profile with synthetic data. Coverage includes notes/address persistence and a simulated one-minute inactivity lock.

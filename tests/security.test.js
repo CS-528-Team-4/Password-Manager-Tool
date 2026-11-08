@@ -5,8 +5,8 @@ import {
   defaults,
   alphabet,
   entropy,
-} from '../src/generator.js';
-import { deriveKey, seal, unseal } from '../src/vault.js';
+} from '../src/lib/security/generator.js';
+import { deriveKey, seal, unseal } from '../src/lib/security/vaultCrypto.js';
 test('generator respects each alphabet and every supported length', () => {
   for (const flag of ['lower', 'upper', 'numbers', 'symbols'])
     for (const length of [4, 20, 128]) {

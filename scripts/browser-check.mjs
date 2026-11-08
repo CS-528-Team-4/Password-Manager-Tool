@@ -1,7 +1,8 @@
-﻿import { mkdir } from 'node:fs/promises';
+import { mkdir } from 'node:fs/promises';
 import { chromium } from '@playwright/test';
 import assert from 'node:assert/strict';
 await mkdir('tmp', { recursive: true });
+const baseURL = process.env.TEST_BASE_URL || 'http://127.0.0.1:5173';
 const browser = await chromium.launch({ channel: 'chrome', headless: true });
 const context = await browser.newContext({
   viewport: { width: 1600, height: 1000 },
@@ -10,7 +11,7 @@ const page = await context.newPage();
 const errors = [];
 page.on('pageerror', (e) => errors.push(e.message));
 try {
-  await page.goto('http://127.0.0.1:5173');
+  await page.goto(baseURL);
   await page.getByRole('dialog').waitFor();
   await page.getByRole('button', { name: 'Close dialog', exact: true }).click();
   await page
@@ -58,12 +59,7 @@ try {
   await page
     .getByRole('button', { name: 'Autofill Demo', exact: true })
     .click();
-  await page
-    .getByLabel('Saved login')
-    .selectOption({ label: 'Example · example.com' });
-  await page
-    .getByRole('button', { name: 'Autofill demo form', exact: true })
-    .click();
+  await page.getByRole('button', { name: /Example example.com/ }).click();
   assert.equal(await page.getByLabel('Demo username').inputValue(), 'student');
   assert.equal(
     await page.getByLabel('Demo password', { exact: true }).inputValue(),
@@ -90,14 +86,15 @@ try {
   assert.deepEqual(demoRequests, []);
   page.off('request', watchRequest);
   await page.screenshot({ path: 'tmp/autofill-demo.png', fullPage: true });
-  await page.getByRole('button', { name: 'Clear form', exact: true }).click();
+  await page.getByRole('button', { name: 'Try again', exact: true }).click();
   assert.equal(
     await page.getByLabel('Demo password', { exact: true }).inputValue(),
     '',
   );
   await page
-    .getByRole('button', { name: 'Autofill demo form', exact: true })
+    .getByRole('button', { name: 'Show saved logins', exact: true })
     .click();
+  await page.getByRole('button', { name: 'Use student', exact: true }).click();
   await page
     .getByRole('button', { name: 'team4@example.com', exact: true })
     .click();
@@ -246,7 +243,7 @@ try {
     'descending',
   );
   const other = await page.context().newPage();
-  await other.goto('http://127.0.0.1:5173');
+  await other.goto(baseURL);
   await other
     .getByLabel('Master password', { exact: true })
     .fill('Team4-test-password!');
@@ -282,6 +279,149 @@ try {
     )
     .waitFor();
   await other.close();
+  // Exercise the remaining vault item types using synthetic data.
+  await page.getByRole('button', { name: 'Notes 0', exact: true }).click();
+  await page.getByRole('button', { name: 'Add item', exact: true }).click();
+  await page.getByLabel('Title', { exact: true }).fill('E2E secure note');
+  await page
+    .getByLabel('Notes', { exact: true })
+    .fill('Synthetic note for the end-to-end check');
+  await page.getByRole('button', { name: 'Save', exact: true }).click();
+  await page
+    .getByRole('button', { name: 'E2E secure note', exact: true })
+    .waitFor();
+  await page.getByRole('button', { name: 'Addresses 0', exact: true }).click();
+  await page.getByRole('button', { name: 'Add item', exact: true }).click();
+  await page.getByLabel('Title', { exact: true }).fill('E2E address');
+  await page.getByLabel('Street', { exact: true }).fill('123 Test Street');
+  await page.getByRole('button', { name: 'Save', exact: true }).click();
+  await page
+    .getByRole('button', { name: 'E2E address', exact: true })
+    .waitFor();
+  await page.reload();
+  await page
+    .getByLabel('Master password', { exact: true })
+    .fill('Team4-test-password!');
+  await page.getByRole('button', { name: 'Unlock vault', exact: true }).click();
+  await page.getByRole('dialog').waitFor({ state: 'hidden' });
+  await page.getByRole('button', { name: 'Notes 1', exact: true }).click();
+  await page
+    .getByRole('button', { name: 'E2E secure note', exact: true })
+    .click();
+  assert.equal(
+    await page.getByLabel('Notes', { exact: true }).inputValue(),
+    'Synthetic note for the end-to-end check',
+  );
+  await page.getByRole('button', { name: 'Cancel', exact: true }).click();
+  await page.getByRole('button', { name: 'Addresses 1', exact: true }).click();
+  await page.getByRole('button', { name: 'E2E address', exact: true }).click();
+  assert.equal(
+    await page.getByLabel('Street', { exact: true }).inputValue(),
+    '123 Test Street',
+  );
+  await page.getByRole('button', { name: 'Cancel', exact: true }).click();
+  await page
+    .getByRole('button', { name: 'Autofill Demo', exact: true })
+    .click();
+  await page.getByRole('button', { name: /Google google.com/ }).click();
+  assert.equal(await page.getByLabel('Demo username').inputValue(), '');
+  await page
+    .getByRole('button', { name: 'Show saved logins', exact: true })
+    .click();
+  await page
+    .getByText('No saved login matches google.com.', { exact: true })
+    .waitFor();
+  await page
+    .getByRole('button', { name: 'Close saved logins', exact: true })
+    .click();
+  await page.getByRole('button', { name: 'Add a login', exact: true }).click();
+  assert.equal(
+    await page.getByLabel('Website', { exact: true }).inputValue(),
+    'https://google.com',
+  );
+  await page.getByLabel('Title', { exact: true }).fill('Google school');
+  await page.getByLabel('Username', { exact: true }).fill('school@example.com');
+  await page
+    .getByLabel('Password', { exact: true })
+    .fill('Fictional-Google-1!');
+  await page.getByRole('button', { name: 'Save', exact: true }).click();
+  await page
+    .getByRole('button', { name: 'Autofill Demo', exact: true })
+    .click();
+  await page.getByRole('button', { name: /Google google.com/ }).click();
+  assert.equal(
+    await page.getByLabel('Demo username').inputValue(),
+    'school@example.com',
+  );
+  await page
+    .getByRole('button', { name: 'All platforms', exact: true })
+    .click();
+  await page.getByRole('button', { name: 'Logins 2', exact: true }).click();
+  await page.getByRole('button', { name: 'Add item', exact: true }).click();
+  await page.getByLabel('Title', { exact: true }).fill('Google personal');
+  await page
+    .getByLabel('Website', { exact: true })
+    .fill('https://accounts.google.com');
+  await page
+    .getByLabel('Username', { exact: true })
+    .fill('personal@example.com');
+  await page
+    .getByLabel('Password', { exact: true })
+    .fill('Fictional-Google-2!');
+  await page.getByRole('button', { name: 'Save', exact: true }).click();
+  await page
+    .getByRole('button', { name: 'Autofill Demo', exact: true })
+    .click();
+  await page.screenshot({ path: 'tmp/platform-cards.png', fullPage: true });
+  await page.getByRole('button', { name: /Google google.com/ }).click();
+  assert.equal(await page.getByLabel('Demo username').inputValue(), '');
+  await page
+    .getByRole('button', { name: 'Use school@example.com', exact: true })
+    .waitFor();
+  await page
+    .getByRole('button', { name: 'Use personal@example.com', exact: true })
+    .click();
+  assert.equal(
+    await page.getByLabel('Demo password', { exact: true }).inputValue(),
+    'Fictional-Google-2!',
+  );
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.screenshot({ path: 'tmp/platform-mobile.png', fullPage: true });
+  assert.equal(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth > innerWidth,
+    ),
+    false,
+  );
+  await page.setViewportSize({ width: 1600, height: 1000 });
+  await page
+    .getByRole('button', { name: 'All platforms', exact: true })
+    .click();
+  await page.clock.install();
+  await page.getByRole('button', { name: 'Settings', exact: true }).click();
+  await page.getByLabel('Automatic lock duration').selectOption('5');
+  await page.getByText('Automatic lock updated', { exact: true }).waitFor();
+  await page.getByLabel('Automatic lock duration').selectOption('1');
+  await page.getByText('Automatic lock updated', { exact: true }).waitFor();
+  await page
+    .getByRole('button', { name: 'Autofill Demo', exact: true })
+    .click();
+  await page.getByRole('button', { name: /Google google.com/ }).click();
+  await page.clock.fastForward(61000);
+  await page.getByText('Vault locked', { exact: true }).waitFor();
+  assert.equal(
+    await page.getByLabel('Demo password', { exact: true }).inputValue(),
+    '',
+  );
+  await page.getByRole('button', { name: 'Unlock vault', exact: true }).click();
+  await page
+    .getByLabel('Master password', { exact: true })
+    .fill('Team4-test-password!');
+  await page
+    .getByRole('dialog')
+    .getByRole('button', { name: 'Unlock vault', exact: true })
+    .click();
+  await page.getByRole('dialog').waitFor({ state: 'hidden' });
   await page.setViewportSize({ width: 390, height: 844 });
   await page
     .getByRole('button', { name: 'Password Generator', exact: true })
@@ -295,8 +435,11 @@ try {
   );
   assert.deepEqual(errors, []);
   console.log(
-    'Browser checks passed: generator, setup, create/edit/delete, favorites, persistence, incorrect password, mobile layout, no runtime errors.',
+    'Browser checks passed: generator, setup/unlock, CRUD, wallet cards/accounts, notes/addresses, favorites/tags/search/sort, persistence, wrong-password rejection, autofill with no network submission, stale-tab protection, lock preferences and timed idle lock, mobile layout, no runtime errors.',
   );
+} catch (error) {
+  await page.screenshot({ path: 'tmp/e2e-failure.png', fullPage: true });
+  throw error;
 } finally {
   await browser.close();
 }

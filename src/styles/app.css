@@ -1471,7 +1471,7 @@ footer {
     padding: 0 1.8vw;
   }
   .brand > span {
-    font-size: 1.85vw;
+    font-size: clamp(30px, 1.85vw, 38px);
   }
   .avast-mark {
     height: 2.4vw;
@@ -1483,7 +1483,7 @@ footer {
     padding: 1.2vw 0.9vw;
   }
   aside h2 {
-    font-size: 1.08vw;
+    font-size: clamp(17px, 1.08vw, 22px);
     gap: 0.8vw;
     margin: 0.8vw 0.9vw 2vw;
   }
@@ -1491,11 +1491,11 @@ footer {
     width: 1.2vw;
   }
   aside small {
-    font-size: 0.7vw;
+    font-size: clamp(13px, 0.7vw, 15px);
     margin: 1.5vw 0.9vw 0.7vw;
   }
   .nav {
-    font-size: 0.94vw;
+    font-size: clamp(16px, 0.94vw, 19px);
     padding: 0.6vw 1vw;
     gap: 0.9vw;
   }
@@ -1504,27 +1504,27 @@ footer {
     height: 1.2vw;
   }
   .encrypted {
-    font-size: 0.7vw;
+    font-size: clamp(13px, 0.7vw, 15px);
     padding: 0.6vw;
     margin-bottom: 0.6vw;
   }
   .sidebar-bottom {
-    font-size: 0.6vw;
+    font-size: clamp(12px, 0.6vw, 14px);
     margin: 2.4vw 1vw 0;
   }
   .account {
-    font-size: 0.94vw;
+    font-size: clamp(16px, 0.94vw, 19px);
   }
   main {
     margin-left: 15.9vw;
     padding: 6.6vw 2.3vw 75px;
   }
   h1 {
-    font-size: 1.12vw;
+    font-size: clamp(22px, 1.12vw, 25px);
     margin-bottom: 0.7vw;
   }
   .muted {
-    font-size: 0.84vw;
+    font-size: clamp(15px, 0.84vw, 18px);
   }
   .generator {
     width: 56.5vw;
@@ -1538,7 +1538,7 @@ footer {
     gap: 1vw;
   }
   .password {
-    font-size: 2vw;
+    font-size: clamp(30px, 2vw, 42px);
     letter-spacing: 0.2vw;
   }
   .password-output svg {
@@ -1550,17 +1550,17 @@ footer {
   }
   .generator-settings {
     padding: 1.8vw;
-    font-size: 0.94vw;
+    font-size: clamp(16px, 0.94vw, 19px);
   }
   .strength-text {
-    font-size: 0.76vw;
+    font-size: clamp(14px, 0.76vw, 17px);
   }
   .generator-settings h3 {
-    font-size: 0.7vw;
+    font-size: clamp(13px, 0.7vw, 15px);
     margin-top: 2vw;
   }
   .generator-settings .fine {
-    font-size: 0.65vw;
+    font-size: clamp(13px, 0.65vw, 15px);
   }
   .generator-settings .estimate {
     margin: 1vw 0 0.5vw;
@@ -1572,7 +1572,7 @@ footer {
   .length-number {
     width: 3.5vw;
     padding: 0.4vw !important;
-    font-size: 0.8vw;
+    font-size: clamp(14px, 0.8vw, 17px);
   }
   .length-row input[type='range']::-webkit-slider-thumb {
     width: 1.9vw;
@@ -1583,14 +1583,14 @@ footer {
     gap: 1.4vw;
   }
   .checks .check {
-    font-size: 0.88vw;
+    font-size: clamp(15px, 0.88vw, 18px);
   }
   .checks input[type='checkbox'] {
     width: 1.2vw;
     height: 1.2vw;
   }
   .restore {
-    font-size: 0.7vw;
+    font-size: clamp(13px, 0.7vw, 15px);
     padding: 0.5vw 1.2vw;
     margin-top: 1.65vw;
   }
@@ -1607,10 +1607,10 @@ footer {
     min-height: 32vw;
   }
   .empty h2 {
-    font-size: 1vw;
+    font-size: clamp(20px, 1vw, 23px);
   }
   .empty p {
-    font-size: 0.84vw;
+    font-size: clamp(15px, 0.84vw, 18px);
     max-width: 18vw;
   }
   .empty > svg {
@@ -1636,7 +1636,7 @@ footer {
   }
   .editor input,
   .editor textarea {
-    font-size: 0.94vw;
+    font-size: clamp(16px, 0.94vw, 19px);
   }
   .editor-field input {
     height: 3vw;
@@ -1646,7 +1646,7 @@ footer {
     top: calc(1.5vw - 12px);
   }
   .actions button {
-    font-size: 0.8vw;
+    font-size: clamp(14px, 0.8vw, 17px);
     padding: 0.5vw 1.3vw;
   }
   .empty-logins-page .table-wrap {
@@ -1661,15 +1661,15 @@ footer {
   }
   .empty-logins-page .login-empty > button {
     min-width: 18vw;
-    font-size: 0.8vw;
+    font-size: clamp(14px, 0.8vw, 17px);
     padding: 0.6vw;
   }
   .empty-logins-page th {
-    font-size: 0.7vw;
+    font-size: clamp(13px, 0.7vw, 15px);
     padding: 1vw 2.3vw;
   }
   .empty-logins-page .login-empty p {
-    font-size: 0.94vw;
+    font-size: clamp(16px, 0.94vw, 19px);
   }
   .empty-logins-page .table-wrap th:first-child {
     width: 27%;
@@ -1685,15 +1685,15 @@ footer {
     margin-bottom: 2.8vw;
   }
   .password-help > h2 {
-    font-size: 1.36vw;
+    font-size: clamp(25px, 1.36vw, 29px);
     margin-bottom: 2vw;
   }
   .password-help .accordion h3 > button {
-    font-size: 1.12vw;
+    font-size: clamp(22px, 1.12vw, 25px);
     padding: 1.6vw 1.5vw;
   }
   .password-help .help-content {
-    font-size: 0.94vw;
+    font-size: clamp(16px, 0.94vw, 19px);
     padding: 0.6vw 1.5vw 1.8vw;
   }
   .manual-illustration {
@@ -1705,7 +1705,7 @@ footer {
     right: 2.1vw;
   }
   footer {
-    font-size: 0.62vw;
+    font-size: clamp(12px, 0.62vw, 14px);
   }
 }
 @media (max-width: 1200px) {
@@ -1974,5 +1974,310 @@ footer {
   .demo-controls,
   .demo-login {
     padding: 20px;
+  }
+}
+
+/* Keep desktop labels readable on laptop screens as well as large monitors. */
+:root {
+  font-size: 16px;
+}
+p {
+  line-height: 1.6;
+}
+.fine {
+  font-size: 14px;
+}
+.help-project-note {
+  font-size: 13px !important;
+}
+.tag-list span {
+  font-size: 13px;
+}
+input,
+textarea,
+select {
+  line-height: 1.4;
+}
+.generator-settings h3,
+aside small {
+  letter-spacing: 0.3px;
+}
+.account {
+  overflow-wrap: anywhere;
+}
+.password-help .accordion h3 > button {
+  font-size: clamp(18px, 1.12vw, 23px);
+}
+.checks {
+  row-gap: 18px;
+}
+.empty p {
+  line-height: 1.6;
+}
+@media (min-width: 1201px) {
+  :root {
+    --sidebar-width: clamp(250px, 15.9vw, 326px);
+  }
+  aside {
+    width: var(--sidebar-width);
+  }
+  main {
+    margin-left: var(--sidebar-width);
+  }
+  .wallet-menu-backdrop {
+    left: var(--sidebar-width);
+  }
+  aside h2 {
+    white-space: normal;
+    line-height: 1.35;
+    gap: 10px;
+    margin-left: 12px;
+    margin-right: 0;
+  }
+  aside h2 svg {
+    flex-shrink: 0;
+    width: 21px;
+    height: 21px;
+  }
+  .nav {
+    gap: 12px;
+    min-height: 44px;
+    padding: 11px 14px;
+  }
+  .nav svg {
+    width: 22px;
+    height: 22px;
+  }
+  .encrypted {
+    line-height: 1.35;
+  }
+  .sidebar-bottom {
+    margin-left: 12px;
+    margin-right: 0;
+    line-height: 1.5;
+  }
+  .generator-settings {
+    line-height: 1.5;
+  }
+  .length-row {
+    flex-wrap: wrap;
+  }
+  .length-row input[type='range'] {
+    min-width: 150px;
+  }
+  .length-number {
+    min-width: 60px;
+  }
+  .password-help .accordion h3 > button {
+    line-height: 1.45;
+  }
+  .empty-logins-page th {
+    font-size: 14px;
+  }
+  .editor input,
+  .editor textarea {
+    font-size: 16px;
+  }
+  .actions button {
+    font-size: 15px;
+  }
+  .restore {
+    font-size: 14px;
+  }
+  .empty-logins-page .login-empty > button {
+    font-size: 15px;
+  }
+  .empty-logins-page .login-empty p {
+    font-size: 16px;
+  }
+}
+@media (max-width: 700px) {
+  .fine {
+    font-size: 13px;
+  }
+  .account {
+    font-size: 13px;
+  }
+  .generator-settings {
+    font-size: 16px;
+  }
+  .generator-settings .check {
+    font-size: 15px;
+  }
+  .demo-controls > h2,
+  .demo-login > h2 {
+    font-size: 21px;
+  }
+}
+/* Distinguish the current page, pointer hover, and keyboard focus. */
+::selection {
+  background: #b6daff;
+  color: #071e2b;
+}
+.nav:not(.active):hover {
+  background: #20495e;
+  color: #fff;
+}
+.nav.active,
+.nav.active:hover {
+  background: #ff8300;
+  color: #071e2b;
+}
+.nav.active svg {
+  stroke: currentColor;
+}
+.nav:focus-visible {
+  outline: 3px solid #8dc7ff;
+  outline-offset: 2px;
+}
+.primary:not(:disabled):hover,
+.fab:not(:disabled):hover,
+.save-generated:not(:disabled):hover {
+  background: #1769cd;
+  border-color: #8dc7ff;
+}
+.primary:disabled:hover,
+.fab:disabled:hover {
+  background: #0078ff;
+}
+.check:has(input:focus-visible) {
+  outline: 2px solid #8dc7ff;
+  outline-offset: 5px;
+  border-radius: 2px;
+}
+.check input:focus-visible {
+  outline: 0;
+}
+.check:has(input:checked) {
+  color: #f4f7fa;
+}
+.item-link:hover {
+  color: #8fcaff;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+tbody tr:not(.placeholder-row):hover td {
+  background: #10384b;
+}
+button[aria-pressed='true'] {
+  color: #ffb347;
+}
+.symbol {
+  color: #429fff;
+}
+.strength-line.empty {
+  background: #36586b;
+}
+.strength-text.empty {
+  color: #bdd1dc;
+}
+.password-help .accordion h3 > button:hover {
+  background: #ffffff08;
+}
+.password-help .accordion.expanded h3 > button {
+  color: #f4f7fa;
+}
+.password-help .accordion h3 > button:focus-visible {
+  outline: 3px solid #8dc7ff;
+  outline-offset: -5px;
+}
+.settings select:focus-visible,
+.demo-controls select:focus-visible {
+  outline: 3px solid #8dc7ff;
+  outline-offset: 3px;
+}
+button:disabled {
+  cursor: not-allowed;
+}
+/* Clear pointer feedback without shifting controls or changing selected states. */
+@media (hover: hover) and (pointer: fine) {
+  button {
+    transition:
+      background-color 0.15s ease,
+      border-color 0.15s ease,
+      color 0.15s ease,
+      box-shadow 0.15s ease;
+  }
+  button:not(:disabled):hover {
+    border-color: #8dc7ff;
+    background-color: #244e64;
+  }
+  .nav:not(.active):hover {
+    background: #204b62;
+    box-shadow: inset 4px 0 #75baff;
+    color: #fff;
+  }
+  .nav.active:hover {
+    background: #ff951f;
+    box-shadow: inset 4px 0 #ffd29e;
+    color: #071e2b;
+  }
+  .primary:not(:disabled):hover,
+  .fab:not(:disabled):hover,
+  .save-generated:not(:disabled):hover {
+    background: #1769cd;
+    border-color: #8dc7ff;
+    box-shadow: 0 0 0 3px #70b8ff30;
+  }
+  .encrypted:not(:disabled):hover {
+    filter: brightness(1.08);
+    box-shadow: 0 0 0 3px #9be52c30;
+  }
+  .restore:not(.save-generated):hover {
+    background: #244e64;
+    border-color: #e7f3fb;
+  }
+  .account:hover {
+    background: #244e64;
+  }
+  .password-output button:hover,
+  .input-row button:hover,
+  .demo-secret button:hover,
+  .close:hover {
+    background: #2a536b;
+    color: #fff;
+    border-radius: 6px;
+  }
+  .danger:not(:disabled):hover {
+    background: #622b35;
+    color: #ffe3e6;
+    border-color: #ffadb7;
+  }
+  .check:hover {
+    color: #b7dcff;
+  }
+  .check:hover input {
+    box-shadow: 0 0 0 3px #70b8ff30;
+  }
+  .password-help .accordion h3 > button:hover {
+    background: #214b62;
+  }
+  .item-link:hover {
+    background: #244e64;
+    color: #b7ddff;
+  }
+  .wallet-add-menu > button:hover {
+    background: transparent;
+    color: #b7dcff;
+  }
+  .wallet-add-menu > button:hover > span {
+    background: #24516b;
+    border-color: #86c4ff;
+  }
+  .sort-button:hover {
+    background: transparent;
+    color: #b7dcff;
+  }
+  .remind:hover {
+    background: #244e64;
+    color: #b7dcff;
+  }
+  tbody tr:not(.placeholder-row):hover td {
+    background: #163f53;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  button {
+    transition: none;
   }
 }

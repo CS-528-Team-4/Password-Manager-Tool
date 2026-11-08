@@ -1,0 +1,451 @@
+﻿.platform-demo {
+  max-width: 1120px;
+  margin: 30px auto 0;
+}
+.platform-intro {
+  margin-bottom: 32px;
+}
+.demo-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  background: #183e51;
+  border: 1px solid #346078;
+  border-radius: 20px;
+  color: #a6d6ff;
+  padding: 6px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+}
+.platform-intro h2 {
+  font-size: clamp(24px, 2vw, 32px);
+  line-height: 1.3;
+  margin: 18px 0 12px;
+}
+.platform-intro p {
+  color: #b6cfdd;
+  margin: 6px 0;
+}
+.platform-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 20px;
+}
+.platform-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  gap: 10px;
+  padding: 28px;
+  border: 1px solid #31576c;
+  border-radius: 15px;
+  background: #082432;
+  text-align: left;
+  min-height: 225px;
+  transition:
+    background 0.15s,
+    border-color 0.15s,
+    box-shadow 0.15s;
+}
+.platform-card b {
+  font-size: 21px;
+}
+.platform-logo {
+  width: 54px;
+  height: 54px;
+  display: grid;
+  place-items: center;
+  border-radius: 14px;
+  font-size: 32px;
+  font-weight: 700;
+  margin-bottom: 8px;
+  background: #eaf4ff;
+  color: #1a68d5;
+  flex-shrink: 0;
+}
+.platform-logo.google {
+  background: #fff;
+  color: #4285f4;
+  font-family: Arial, sans-serif;
+}
+.platform-logo.youtube {
+  background: #fff1f1;
+  color: #e62117;
+  font-size: 27px;
+}
+.platform-logo.school {
+  background: #e5edff;
+  color: #4b51be;
+}
+.platform-logo.shop {
+  background: #fff0dc;
+  color: #9c5700;
+}
+.platform-domain {
+  font-size: 14px;
+  color: #9fbcca;
+  font-weight: 400;
+  overflow-wrap: anywhere;
+}
+.platform-count {
+  font-size: 12px;
+  color: #a8bfcc;
+  font-weight: 400;
+  border-top: 1px solid #24485c;
+  width: 100%;
+  padding-top: 15px;
+  margin-top: 7px;
+}
+.platform-count.available {
+  color: #b1e76d;
+}
+.platform-browser {
+  border: 1px solid #375f75;
+  border-radius: 16px;
+  overflow: hidden;
+}
+.platform-browser-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  background: #183d51;
+  padding: 13px 20px;
+}
+.platform-browser-bar > button {
+  border: 0;
+  font-size: 14px;
+  padding: 7px 10px;
+  border-radius: 6px;
+}
+.platform-browser-bar > span {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: #bad4e2;
+  overflow-wrap: anywhere;
+}
+.practice-label {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  border: 1px solid #6c91a6;
+  border-radius: 5px;
+  padding: 3px 6px;
+}
+.platform-login-area {
+  padding: 44px 24px;
+  background: #eaf0f6;
+  min-height: 580px;
+  color: #172b3b;
+  color-scheme: light;
+}
+.platform-login-card {
+  max-width: 430px;
+  margin: 0 auto;
+  background: white;
+  border: 1px solid #d8e2ec;
+  border-radius: 16px;
+  padding: 34px;
+  box-shadow: 0 10px 25px #1631470b;
+}
+.platform-login-card > .platform-logo {
+  margin: 0 auto 18px;
+}
+.platform-login-card h2 {
+  font-size: 25px;
+  text-align: center;
+  line-height: 1.4;
+  margin: 0 0 8px;
+}
+.platform-login-subtitle {
+  text-align: center;
+  color: #5b7082;
+  font-size: 14px;
+  margin: 0 0 30px;
+}
+.platform-login-card label {
+  font-size: 14px;
+  font-weight: 600;
+  gap: 9px;
+  color: #284052;
+  margin-bottom: 20px;
+}
+.platform-field {
+  position: relative;
+}
+.platform-field input {
+  width: 100%;
+  background: #fff !important;
+  border: 1px solid #9fb1c0 !important;
+  color: #172b3b !important;
+  border-radius: 7px !important;
+  min-height: 48px;
+  padding: 12px 62px 12px 13px !important;
+  font-size: 16px !important;
+}
+.platform-field input:focus {
+  border-color: #176fc6 !important;
+  outline: 2px solid #9dccff;
+  outline-offset: 1px;
+}
+.platform-field > button {
+  position: absolute;
+  right: 8px;
+  top: 11px;
+  border: 0;
+  border-radius: 5px;
+  padding: 4px;
+  color: #386385;
+  gap: 2px;
+}
+.platform-field > button:hover {
+  background: #e2efff !important;
+  color: #174a75 !important;
+}
+.platform-signin {
+  width: 100%;
+  border-radius: 7px;
+  min-height: 46px;
+  font-size: 15px;
+}
+.vault-suggestions {
+  margin: -12px 0 20px;
+  border: 1px solid #b5cde0;
+  border-radius: 9px;
+  overflow: hidden;
+  box-shadow: 0 8px 22px #12324e1c;
+  background: #fff;
+}
+.suggestion-heading {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  background: #0c2e40;
+  color: #edf8ff;
+  padding: 10px 12px;
+  font-size: 12px;
+  font-weight: 600;
+}
+.suggestion-heading > button {
+  margin-left: auto;
+  padding: 0 4px;
+  border: 0;
+  font-size: 22px;
+  line-height: 1;
+  color: white;
+}
+.vault-suggestions > button {
+  width: 100%;
+  justify-content: flex-start;
+  border: 0;
+  border-radius: 0;
+  text-align: left;
+  padding: 14px 12px;
+  color: #213d51;
+  gap: 12px;
+  border-top: 1px solid #e0eaf2;
+}
+.vault-suggestions > button:hover,
+.vault-suggestions > button:focus-visible {
+  background: #eaf3ff !important;
+  color: #163e63 !important;
+}
+.vault-suggestions b {
+  font-size: 14px;
+  display: block;
+  overflow-wrap: anywhere;
+}
+.vault-suggestions small {
+  display: block;
+  font-size: 11px;
+  color: #607c90;
+  font-weight: 400;
+  margin-top: 4px;
+  overflow-wrap: anywhere;
+}
+.suggestion-key {
+  display: grid;
+  place-items: center;
+  width: 33px;
+  height: 33px;
+  background: #e9f2ff;
+  border-radius: 7px;
+  color: #3275b5;
+  flex-shrink: 0;
+}
+.no-match {
+  padding: 15px;
+  color: #526b7e;
+  font-size: 13px;
+}
+.no-match p {
+  margin-top: 0;
+}
+.no-match > button {
+  font-size: 13px;
+  color: #176fc6;
+  border-color: #9cbdd8;
+}
+.platform-filled {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  color: #36720b;
+  font-size: 12px;
+  margin: 16px 0;
+}
+.platform-login-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  margin-top: 22px;
+  padding-top: 16px;
+  border-top: 1px solid #e3ebf2;
+}
+.platform-login-actions > button {
+  font-size: 12px;
+  border: 0;
+  color: #32678f;
+  padding: 5px;
+  border-radius: 4px;
+}
+.platform-login-actions > button:hover {
+  background: #e5f1ff !important;
+  color: #12456c !important;
+}
+.platform-login-actions > span {
+  font-size: 11px;
+  color: #5c788b;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.platform-success {
+  color: #36720b;
+  line-height: 1.7;
+  font-size: 14px;
+  text-align: center;
+}
+.platform-success svg {
+  display: block;
+  margin: 25px auto 10px;
+}
+.platform-login-card > button {
+  width: 100%;
+  margin-top: 20px;
+}
+.platform-demo button:focus-visible {
+  outline: 3px solid #4099ee;
+  outline-offset: 3px;
+}
+@media (hover: hover) {
+  .platform-card:hover {
+    background: #10384b !important;
+    border-color: #75baff;
+    box-shadow: 0 5px 18px #0002;
+  }
+}
+@media (max-width: 1000px) {
+  .platform-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 700px) {
+  .platform-demo {
+    margin-top: 20px;
+  }
+  .platform-grid {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+  .platform-card {
+    min-height: 190px;
+    padding: 22px;
+  }
+  .platform-browser-bar {
+    padding: 10px;
+    flex-wrap: wrap;
+  }
+  .platform-browser-bar > span {
+    font-size: 12px;
+  }
+  .platform-login-area {
+    padding: 22px 12px;
+    min-height: 0;
+  }
+  .platform-login-card {
+    padding: 23px 18px;
+  }
+  .platform-login-card h2 {
+    font-size: 22px;
+  }
+  .platform-login-actions {
+    flex-wrap: wrap;
+  }
+}
+.platform-login-card .primary {
+  color: #fff;
+}
+.platform-login-card .primary:hover {
+  color: #fff;
+}
+.platform-login-card > button:not(.primary) {
+  color: #245d89;
+  border-color: #a4bdcf;
+}
+/* Platform cards display self-contained logos with no external image requests. */
+.platform-card {
+  align-items: center;
+  text-align: center;
+  padding: 32px 24px;
+  gap: 10px;
+  min-height: 250px;
+}
+.platform-card .platform-logo {
+  width: 86px;
+  height: 86px;
+  border-radius: 22px;
+  margin: 0 0 12px;
+  box-shadow: 0 4px 14px #0001;
+}
+.platform-logo svg {
+  width: 52%;
+  height: 52%;
+  display: block;
+  overflow: visible;
+}
+.platform-logo.youtube svg {
+  width: 64%;
+  height: auto;
+}
+.platform-card .platform-count {
+  margin-top: auto;
+  padding-top: 16px;
+}
+.platform-card .platform-domain {
+  margin-bottom: 10px;
+}
+.platform-login-card > .platform-logo {
+  width: 68px;
+  height: 68px;
+  margin-bottom: 20px;
+}
+.platform-logo.custom {
+  background: #e5f5ff;
+  color: #2377a6;
+}
+@media (max-width: 700px) {
+  .platform-card {
+    min-height: 225px;
+  }
+  .platform-card .platform-logo {
+    width: 76px;
+    height: 76px;
+  }
+}
