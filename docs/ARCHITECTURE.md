@@ -33,6 +33,6 @@ Cryptographic functions are separate from browser database operations so they ca
 - `npm run format:check`: consistent source formatting.
 - `npm run test:browser`: Chrome flow with synthetic data and an isolated browser profile; start the app first.
 
-The browser check can target a production preview using `TEST_BASE_URL`. See the README for the PowerShell command. Generated images and scratch files stay in ignored `tmp/`; do not put application source there.
+Development and production preview both use `http://127.0.0.1:5173/`, configured in `vite.config.js`. Strict port checking prevents silently switching to an origin with different IndexedDB storage. Run one server at a time. Browser checks use the same address in an isolated test context. Generated images and scratch files stay in ignored `tmp/`; do not put application source there.
 
 The feature split is an organizational refactor. Biometric unlock, external website autofill, cloud accounts, and password import remain outside the implemented feature set.
