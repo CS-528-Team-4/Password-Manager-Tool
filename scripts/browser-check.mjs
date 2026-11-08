@@ -173,8 +173,102 @@ try {
     'password',
   );
   await page.getByLabel('CVV/CVC', { exact: true }).fill('123');
+  await page.getByLabel('Cardholder', { exact: true }).fill('Demo Student');
+  await page.getByLabel('Expiration', { exact: true }).fill('2028-12');
   await page.getByRole('button', { name: 'Save', exact: true }).click();
   await page.getByRole('button', { name: 'Test card', exact: true }).waitFor();
+  await page
+    .getByRole('button', { name: 'Card Autofill Demo', exact: true })
+    .click();
+  await page
+    .getByRole('button', { name: 'Choose a saved card', exact: true })
+    .click();
+  await page
+    .getByRole('button', { name: 'Use card Test card', exact: true })
+    .click();
+  assert.equal(
+    await page.getByLabel('Checkout cardholder').inputValue(),
+    'Demo Student',
+  );
+  assert.equal(
+    await page.getByLabel('Checkout card number', { exact: true }).inputValue(),
+    '4111111111111111',
+  );
+  assert.equal(
+    await page.getByLabel('Checkout expiration').inputValue(),
+    '2028-12',
+  );
+  assert.equal(
+    await page
+      .getByLabel('Checkout security code', { exact: true })
+      .inputValue(),
+    '123',
+  );
+  assert.equal(
+    await page
+      .getByLabel('Checkout card number', { exact: true })
+      .getAttribute('type'),
+    'password',
+  );
+  await page.screenshot({ path: 'tmp/card-checkout.png', fullPage: true });
+  await page.setViewportSize({ width: 390, height: 844 });
+  assert.equal(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth > innerWidth,
+    ),
+    false,
+  );
+  await page.setViewportSize({ width: 1600, height: 1000 });
+  const paymentRequests = [];
+  const watchPayment = (r) => paymentRequests.push(r.url());
+  page.on('request', watchPayment);
+  await page
+    .getByRole('button', { name: 'Complete demo checkout', exact: true })
+    .click();
+  await page
+    .getByText('No payment was processed and no card details were sent.', {
+      exact: true,
+    })
+    .waitFor();
+  assert.deepEqual(paymentRequests, []);
+  page.off('request', watchPayment);
+  await page
+    .getByRole('button', { name: 'Try another card', exact: true })
+    .click();
+  assert.equal(
+    await page.getByLabel('Checkout card number', { exact: true }).inputValue(),
+    '',
+  );
+  await page
+    .getByRole('button', { name: 'Choose a saved card', exact: true })
+    .click();
+  await page
+    .getByRole('button', { name: 'Use card Test card', exact: true })
+    .click();
+  await page
+    .getByRole('button', { name: 'team4@example.com', exact: true })
+    .click();
+  assert.equal(
+    await page.getByLabel('Checkout card number', { exact: true }).inputValue(),
+    '',
+  );
+  assert.equal(
+    await page
+      .getByLabel('Checkout security code', { exact: true })
+      .inputValue(),
+    '',
+  );
+  await page.getByRole('button', { name: 'Unlock vault', exact: true }).click();
+  await page
+    .getByLabel('Master password', { exact: true })
+    .fill('Team4-test-password!');
+  await page
+    .getByRole('dialog')
+    .getByRole('button', { name: 'Unlock vault', exact: true })
+    .click();
+  await page.getByRole('dialog').waitFor({ state: 'hidden' });
+  await page.getByRole('button', { name: 'Wallet 1', exact: true }).click();
+
   await page.getByRole('button', { name: 'Add item', exact: true }).click();
   await page.getByRole('button', { name: 'Accounts', exact: true }).click();
   await page

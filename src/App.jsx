@@ -16,6 +16,7 @@ import { deriveKey, seal, unseal } from './lib/security/vaultCrypto.js';
 import { readVault, writeVault } from './lib/storage/vaultStore.js';
 
 import AutofillDemo from './components/demo/AutofillDemo.jsx';
+import CardAutofillDemo from './components/demo/CardAutofillDemo.jsx';
 import PasswordHelp from './components/vault/PasswordHelp.jsx';
 import { SetupComplete } from './components/auth/Setup.jsx';
 export default function App() {
@@ -394,6 +395,29 @@ export default function App() {
               setDraft({
                 type: 'Logins',
                 values: { Website: website },
+                favorite: false,
+              });
+            }}
+          />
+        ) : page === 'Card Autofill Demo' ? (
+          <CardAutofillDemo
+            unlocked={!!key}
+            items={data.items}
+            onUnlock={() => {
+              setError('');
+              setModal('unlock');
+            }}
+            onCreate={() => {
+              if (!key) {
+                setModal('unlock');
+                return;
+              }
+              setPage('Wallet');
+              setVisibleField(null);
+              setDraft({
+                type: 'Wallet',
+                kind: 'card',
+                values: {},
                 favorite: false,
               });
             }}

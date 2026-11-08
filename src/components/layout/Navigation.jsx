@@ -1,6 +1,7 @@
 import React from 'react';
 import {
   KeyRound,
+  CreditCard,
   UserRound,
   Settings,
   SlidersHorizontal,
@@ -81,6 +82,14 @@ export default function Navigation({
         >
           <UserRound />
           Autofill Demo
+        </button>
+        <button
+          className={'nav ' + (page === 'Card Autofill Demo' ? 'active' : '')}
+          aria-current={page === 'Card Autofill Demo' ? 'page' : undefined}
+          onClick={() => go('Card Autofill Demo')}
+        >
+          <CreditCard />
+          Card Autofill Demo
         </button>
         <div className="sidebar-bottom">
           <ShieldCheck size={17} /> Team 4 · Educational project
