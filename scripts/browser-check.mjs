@@ -1,5 +1,5 @@
 import { mkdir } from 'node:fs/promises';
-import { chromium } from '@playwright/test';
+import { chromium, expect } from '@playwright/test';
 import assert from 'node:assert/strict';
 await mkdir('tmp', { recursive: true });
 const baseURL = process.env.TEST_BASE_URL || 'http://127.0.0.1:5173';
@@ -21,6 +21,16 @@ try {
   await page.getByLabel('Password length', { exact: true }).fill('32');
   assert.equal((await page.locator('.password').innerText()).length, 32);
   await page.screenshot({ path: 'tmp/app-generator.png', fullPage: true });
+  // Regression: a vault category opened before any vault exists shows the
+  // locked empty state with a setup action instead of crashing.
+  await page.getByRole('button', { name: 'Logins 0', exact: true }).click();
+  await page
+    .getByRole('heading', { name: 'Your vault, secured', exact: true })
+    .waitFor();
+  await page
+    .getByRole('button', { name: 'Set up vault', exact: true })
+    .waitFor();
+  assert.deepEqual(errors, []);
   await page.getByRole('button', { name: 'Settings', exact: true }).click();
   await page.getByRole('button', { name: 'Set up vault', exact: true }).click();
   await page.getByLabel('Email', { exact: true }).fill('team4@example.com');
@@ -98,9 +108,10 @@ try {
   await page
     .getByRole('button', { name: 'team4@example.com', exact: true })
     .click();
-  assert.equal(await page.getByLabel('Demo username').inputValue(), '');
-  assert.equal(
-    await page.getByLabel('Demo password', { exact: true }).inputValue(),
+  // The demo form clears in an effect after the locked render, so wait for
+  // the cleared state instead of reading it once immediately after the click.
+  await expect(page.getByLabel('Demo username')).toHaveValue('');
+  await expect(page.getByLabel('Demo password', { exact: true })).toHaveValue(
     '',
   );
   await page.reload();
@@ -118,8 +129,28 @@ try {
   await page.getByRole('button', { name: 'Logins 1', exact: true }).click();
   await page.getByRole('button', { name: 'example.com', exact: true }).click();
   await page.getByLabel('Title', { exact: true }).fill('Updated example');
+  // Regression: Escape must not silently discard an unsaved edit.
+  await page.keyboard.press('Escape');
+  await page
+    .getByRole('heading', { name: 'Edit a Login', exact: true })
+    .waitFor();
+  assert.equal(
+    await page.getByLabel('Title', { exact: true }).inputValue(),
+    'Updated example',
+  );
   await page.getByRole('button', { name: 'Save', exact: true }).click();
   await page.getByRole('button', { name: 'example.com', exact: true }).click();
+  assert.equal(
+    await page.getByLabel('Title', { exact: true }).inputValue(),
+    'Updated example',
+  );
+  await page.getByRole('button', { name: 'Delete item', exact: true }).click();
+  // Escape dismisses the delete confirmation and returns to the open editor.
+  await page.keyboard.press('Escape');
+  await page.getByRole('dialog').waitFor({ state: 'hidden' });
+  await page
+    .getByRole('heading', { name: 'Edit a Login', exact: true })
+    .waitFor();
   await page.getByRole('button', { name: 'Delete item', exact: true }).click();
   await page
     .getByRole('dialog')
@@ -248,16 +279,13 @@ try {
   await page
     .getByRole('button', { name: 'team4@example.com', exact: true })
     .click();
-  assert.equal(
-    await page.getByLabel('Checkout card number', { exact: true }).inputValue(),
-    '',
-  );
-  assert.equal(
-    await page
-      .getByLabel('Checkout security code', { exact: true })
-      .inputValue(),
-    '',
-  );
+  // The checkout form also clears in an effect after the locked render.
+  await expect(
+    page.getByLabel('Checkout card number', { exact: true }),
+  ).toHaveValue('');
+  await expect(
+    page.getByLabel('Checkout security code', { exact: true }),
+  ).toHaveValue('');
   await page.getByRole('button', { name: 'Unlock vault', exact: true }).click();
   await page
     .getByLabel('Master password', { exact: true })
@@ -380,6 +408,15 @@ try {
   await page
     .getByLabel('Notes', { exact: true })
     .fill('Synthetic note for the end-to-end check');
+  // Regression: Escape keeps an unsaved new entry open with its contents.
+  await page.keyboard.press('Escape');
+  await page
+    .getByRole('heading', { name: 'Add a Note', exact: true })
+    .waitFor();
+  assert.equal(
+    await page.getByLabel('Notes', { exact: true }).inputValue(),
+    'Synthetic note for the end-to-end check',
+  );
   await page.getByRole('button', { name: 'Save', exact: true }).click();
   await page
     .getByRole('button', { name: 'E2E secure note', exact: true })
@@ -412,6 +449,79 @@ try {
   assert.equal(
     await page.getByLabel('Street', { exact: true }).inputValue(),
     '123 Test Street',
+  );
+  await page.getByRole('button', { name: 'Cancel', exact: true }).click();
+  // Regression: locking while a vault category is open shows the locked state
+  // instead of crashing, and unlocking restores the same encrypted records.
+  const storedVault = () =>
+    page.evaluate(
+      () =>
+        new Promise((resolve, reject) => {
+          const open = indexedDB.open('team4-vault', 1);
+          open.onerror = () => reject(open.error);
+          open.onsuccess = () => {
+            const database = open.result;
+            const get = database
+              .transaction('vault')
+              .objectStore('vault')
+              .get('main');
+            get.onerror = () => reject(get.error);
+            get.onsuccess = () => {
+              database.close();
+              resolve(JSON.stringify(get.result));
+            };
+          };
+        }),
+    );
+  const vaultBeforeLocking = await storedVault();
+  for (const secret of ['Test card', '4111111111111111', 'E2E address'])
+    assert.ok(!vaultBeforeLocking.includes(secret));
+  for (const [category, count, item] of [
+    ['Logins', 1, 'generated.example'],
+    ['Favorites', 0, null],
+    ['Wallet', 2, 'Test card'],
+    ['Addresses', 1, 'E2E address'],
+    ['Notes', 1, 'E2E secure note'],
+  ]) {
+    await page
+      .getByRole('button', { name: `${category} ${count}`, exact: true })
+      .click();
+    await page
+      .getByRole('button', { name: 'team4@example.com', exact: true })
+      .click();
+    await page
+      .getByRole('heading', { name: 'Your vault, secured', exact: true })
+      .waitFor();
+    await page
+      .getByText('Unlock your vault to view items', { exact: true })
+      .waitFor();
+    await page
+      .getByRole('button', { name: `${category} 0`, exact: true })
+      .waitFor();
+    assert.deepEqual(errors, []);
+    await page
+      .getByRole('button', { name: 'Unlock vault', exact: true })
+      .click();
+    await page
+      .getByLabel('Master password', { exact: true })
+      .fill('Team4-test-password!');
+    await page
+      .getByRole('dialog')
+      .getByRole('button', { name: 'Unlock vault', exact: true })
+      .click();
+    await page.getByRole('dialog').waitFor({ state: 'hidden' });
+    await page
+      .getByRole('button', { name: `${category} ${count}`, exact: true })
+      .waitFor();
+    if (item)
+      await page.getByRole('button', { name: item, exact: true }).waitFor();
+  }
+  assert.equal(await storedVault(), vaultBeforeLocking);
+  await page.getByRole('button', { name: 'Wallet 2', exact: true }).click();
+  await page.getByRole('button', { name: 'Test card', exact: true }).click();
+  assert.equal(
+    await page.getByLabel('Card number', { exact: true }).inputValue(),
+    '4111111111111111',
   );
   await page.getByRole('button', { name: 'Cancel', exact: true }).click();
   await page
@@ -532,6 +642,7 @@ try {
     'Browser checks passed: generator, setup/unlock, CRUD, wallet cards/accounts, notes/addresses, favorites/tags/search/sort, persistence, wrong-password rejection, autofill with no network submission, stale-tab protection, lock preferences and timed idle lock, mobile layout, no runtime errors.',
   );
 } catch (error) {
+  if (errors.length) console.error('Page errors:', errors);
   await page.screenshot({ path: 'tmp/e2e-failure.png', fullPage: true });
   throw error;
 } finally {
