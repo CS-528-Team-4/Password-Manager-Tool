@@ -4,7 +4,7 @@ An Avast-inspired password generator and encrypted local vault built for **CS 52
 
 **Team 4:** David Amebley and Kofi Ampomah
 
-The application combines configurable password generation with local storage for logins, payment cards, bank accounts, addresses, and secure notes. Its interface follows the Avast reference screenshots supplied by the team. A platform-based autofill demonstration shows how saved credentials can populate a login form.
+The application combines configurable password generation with local storage for logins, payment cards, bank accounts, addresses, and secure notes. Its interface follows the Avast reference screenshots supplied by the team. A platform-based autofill demonstration shows how saved credentials can populate a login form, and a card autofill demonstration fills a sample checkout from a saved card.
 
 This is an independent educational project. It does not connect to Avast services.
 
@@ -14,7 +14,7 @@ This is an independent educational project. It does not connect to Avast service
 
 - Choose a password length from **4 to 128 characters**.
 - Include or exclude uppercase letters, lowercase letters, numbers, and punctuation independently.
-- Exclude ambiguous characters such as `I`, `l`, `1`, `O`, and `0`.
+- Exclude the ambiguous characters `I`, `l`, `1`, `O`, `0`, and `o`.
 - Regenerate passwords, copy them, or open a login draft with the generated password.
 - View a strength indicator and estimated entropy in bits.
 
@@ -37,6 +37,12 @@ This is an independent educational project. It does not connect to Avast service
 - Clear the form or simulate signing in to a local welcome screen.
 
 The platform pages are local simulations. They do not open the real services, authenticate accounts, or transmit credentials. Browser-wide autofill is not implemented.
+
+### Card autofill demo
+
+- Fill a sample checkout's cardholder, card number, expiration, and security code from a saved card.
+- Mask the card number and security code by default; bank accounts and card PINs are never used.
+- Show a local confirmation; no payment is processed and no card data is sent.
 
 ## Technology
 
@@ -129,7 +135,7 @@ While unlocked, decrypted data is available in application memory. Locking clear
 - Clearing site data removes the vault. There is no recovery, backup/export, cloud synchronization, or master-password reset.
 - Web Crypto requires localhost or HTTPS in supported browsers.
 - Copied passwords remain on the clipboard until replaced or cleared by the user/system.
-- Biometric unlock, external website autofill, password import, and passphrase generation are not implemented.
+- Biometric unlock, external website autofill, per-item password re-prompts, password import, and passphrase generation are not implemented.
 
 This course prototype has automated checks but has not received an independent security audit.
 
@@ -164,7 +170,9 @@ The browser script targets `http://127.0.0.1:5173` by default. Run either develo
 | Platform matching | Parsed hostnames, Google aliases, unrelated/lookalike domains, custom platform cards                                       |
 | Browser flow      | Setup/unlock, item creation/editing/deletion, all vault categories, reload persistence, favorites, tags, search, sorting   |
 | Autofill          | Platform cards, matching accounts, automatic fill, multiple-account selection, masking, clear/reset, local-only submission |
+| Card checkout     | Saved-card fill, masked card number, no network requests on checkout, form reset, clearing on lock                         |
 | Session/storage   | Lock preferences, simulated inactivity lock, clearing on lock, rejection of stale-tab saves                                |
+| Regressions       | Locking from each vault category, unchanged ciphertext after lock/unlock, Escape keeps unsaved drafts                      |
 | Layout            | Mobile overflow check and review screenshots                                                                               |
 
 Browser checks use a separate, temporary browser context and fictional credentials. Review images are written to ignored `tmp/`. Automated checks support the team's review; the assignment still requires the team to understand and verify its randomness implementation.
@@ -177,7 +185,7 @@ src/
   App.jsx                        Shared session state and application actions
   components/
     auth/                        Vault setup, unlock, and dialogs
-    demo/                        Platform cards, logos, and practice login flow
+    demo/                        Platform cards, logos, practice login, and card checkout
     generator/                   Password generator screen
     layout/                      Brand, header, and sidebar
     settings/                    Application settings
@@ -209,7 +217,14 @@ Generated dependencies, builds, temporary artifacts, and environment files are e
 
 The interface follows the reference's navy theme, orange active navigation, vault categories, password display, settings controls, help drawer, and setup checklist.
 
-Our generator provides independent uppercase/lowercase controls to satisfy the assignment, rather than the reference's Letters/Mixed case combination. It displays entropy instead of a cracking-time estimate. The vault stores encrypted data locally, and the account flow creates a local profile. Autofill is demonstrated through local practice platforms.
+Our generator provides independent uppercase/lowercase controls to satisfy the assignment, rather than the reference's Letters/Mixed case combination, and adds an option to avoid ambiguous characters. It displays entropy and a three-level strength label instead of a cracking-time estimate.
+
+Other differences from the reference:
+
+- **Account and recovery:** Avast's setup uses an Avast Account and offers a downloadable recovery key. This app creates a local profile only, and a forgotten master password cannot be recovered.
+- **Storage:** the encrypted vault is stored in one browser profile and origin, with no synchronization, export, or import.
+- **Per-item protection:** the reference can require the vault password before opening an individual card. This app protects the whole vault with the master password and automatic lock.
+- **Autofill:** the reference runs as a browser extension. This app demonstrates autofill only on local practice login and checkout pages.
 
 ## Submission checklist
 
