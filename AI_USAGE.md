@@ -1,5 +1,7 @@
-# AI usage statement � draft for team review
+# AI Usage Statement
 
-OpenAI Codex assisted with reading the assignment and approved proposal, reviewing screenshots supplied by the team, implementing the React/Vite interface, password generator, encrypted local vault, documentation, and automated checks.
+AI tools were used to support the development of this project, including brainstorming and refining design decisions, implementing features, reviewing code, identifying and resolving issues, developing tests, and preparing documentation.
 
-The team must review and understand all submitted code, independently verify the cryptographic randomness and vault design, and revise this statement to accurately describe its own contributions and verification. Automated checks are supporting evidence, not a replacement for team verification.
+AI assistance also supported the evaluation of security mechanisms, password generation, and the application's functionality against the selected reference password manager.
+
+The team reviewed and verified the resulting implementation through code inspection, automated unit and browser tests, and successful production builds. We remain responsible for understanding, validating, and explaining the final solution.
