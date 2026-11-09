@@ -125,10 +125,11 @@ export default function App() {
     };
   }, [key, data.settings?.lockMinutes]);
   useEffect(() => {
+    // Escape dismisses overlays only. Unsaved editor drafts are kept; use
+    // Cancel to discard them explicitly.
     const close = (e) => {
       if (e.key === 'Escape') {
         setModal(null);
-        setDraft(null);
         setHelp(null);
         setWalletMenu(false);
       }
@@ -439,6 +440,7 @@ export default function App() {
             page={page}
             visible={visible}
             data={data}
+            record={record}
             unlocked={!!key}
             query={query}
             setQuery={setQuery}

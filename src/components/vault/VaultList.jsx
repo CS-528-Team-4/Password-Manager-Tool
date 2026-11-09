@@ -14,6 +14,7 @@ export default function VaultList({
   page,
   visible,
   data,
+  record,
   unlocked,
   query,
   setQuery,
